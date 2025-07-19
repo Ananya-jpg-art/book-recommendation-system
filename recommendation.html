@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Recommendation System</title>
+    <style>
+         body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4A_2MIksfp3S6S5Dq5bUGW5z_oATu3KS-SI5FGgjck_PP2FBIHh3yRbW4a8gUMcUTkYo&usqp=CAUppp'); /* Background image URL */
+            background-size: cover;
+            background-position: center;
+            padding: 20px;
+            margin: 0;
+        }
+        h1 {
+            text-align: center;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        .genre-selection {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        select {
+            padding: 8px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .book-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .book-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            background-color: #f9f9f9;
+            text-align: center;
+            border-radius: 8px;
+            transition: transform 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .book-item:hover {
+            transform: scale(1.05);
+        }
+        .book-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .book-item h3 {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin: 10px 0;
+        }
+        .book-item p {
+            font-size: 14px;
+            color: #555;
+        }
+        .book-item a {
+            display: block;
+            margin-top: 10px;
+            color: #007BFF;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Book Recommendations</h1>
+
+        <div class="genre-selection">
+            <label for="genre">Select Genre: </label>
+            <select id="genre" onchange="filterBooks()">
+                <option value="all">All Genres</option>
+                <option value="fiction">Fiction</option>
+                <option value="non-fiction">Non-Fiction</option>
+                <option value="mystery">Mystery</option>
+                <option value="fantasy">Fantasy</option>
+                <option value="romance">Romance</option>
+                <option value="thriller">Thriller</option>
+                <option value="science-fiction">Science Fiction</option>
+                <option value="historical">Historical</option>
+                <option value="biography">Biography</option>
+                <option value="self-help">Self-Help</option>
+                <option value="story-books">Story Books</option>
+                <option value="comics">Comics</option>
+                <option value="horror">Horror</option>
+                <option value="horror">Other Books</option>
+            </select>
+        </div>
+
+        <div id="bookList" class="book-list"></div>
+    </div>
+
+    <script>
+        const books = [
+            // Fiction Books
+            {title:"ಕನ್ನಡ ಎಮ್ಮೆ",author:"Beechi",rating:3.78,genre:"fiction",link:"https://www.goodreads.com/book/show/18375657-kannada-emme?from_search=true&from_srp=true&qid=YbfeEjVxJl&rank=1"},
+            { title: "The Great Gatsby", author: "F. Scott Fitzgerald", rating: 3.93, genre: "fiction", link: "https://www.goodreads.com/book/show/4671.The_Great_Gatsby" },
+            {title:"Parva",author:"S.L. Bhyrappa, K. Raghavendra Rao(Translator)",rating:4.44,genre:"fiction",link:"https://www.goodreads.com/book/show/8439160-parva?ref=rae_3"},
+            { title: "1984", author: "George Orwell", rating: 4.7, genre: "fiction", link: "https://www.goodreads.com/book/show/5470.1984" },
+            {title:"ಮರಳಿ ಮಣ್ಣಿಗೆ ",author:"Kota Shivarama Karanth",rating:4.30,genre:"fiction",link:"https://www.goodreads.com/book/show/15818756-marali-mannige?ref=rae_0"},
+            { title: "Pride and Prejudice", author: "Jane Austen", rating: 4.6, genre: "fiction", link: "https://www.goodreads.com/book/show/1885.Pride_and_Prejudice" },
+            {title:"ಗೃಹಭಂಗ",author:"S.L. Bhyrappa",rating:4.42,genre:"fiction",link:"https://www.goodreads.com/book/show/13625007-grihabhanga?ref=rae_6"},
+            { title: "The Catcher in the Rye", author: "J.D. Salinger", rating: 4.2, genre: "fiction", link: "https://www.goodreads.com/book/show/5107.The_Catcher_in_the_Rye" },
+            {title:"ನಾಯಿ ನೆರಳು",author:"S.L. Bhyrappa",rating:4.14,genre:"fiction",link:"https://www.goodreads.com/book/show/13626185-naayi-neralu?ref=rae_1"},
+            { title: "Brave New World", author: "Aldous Huxley", rating: 4.5, genre: "fiction", link: "https://www.goodreads.com/book/show/5175.Brave_New_World" },
+            { title: "To Kill a Mockingbird", author: "Harper Lee", rating: 4.28, genre: "fiction", link: "https://www.goodreads.com/book/show/2657.To_Kill_a_Mockingbird" },
+            {title:"ಮೂಕಜ್ಜಿಯ ಕನಸುಗಳು",author:"Kota Shivarama Karanth",rating:4.25,genre:"fiction",link:"https://www.goodreads.com/book/show/15734967-mookajjiya-kanasugalu?ref=rae_2#CommunityReviews"},
+            { title: "Moby Dick", author: "Herman Melville", rating: 3.5, genre: "fiction", link: "https://www.goodreads.com/book/show/153747.Moby_Dick" },
+            { title: "Crime and Punishment", author: "Fyodor Dostoevsky", rating: 4.2, genre: "fiction", link: "https://www.goodreads.com/book/show/7144.Crime_and_Punishment" },
+            {title:"ಅಮ್ಮ ಹೇಳಿದ ಎಂಟು ಸುಳ್ಳುಗಳು",author:"A.R. Manikanth",rating:4.20,genre:"fiction",link:"https://www.goodreads.com/book/show/13004959-amma-helida-entu-sullugalu?ref=rae_3"},
+            { title: "The Brothers Karamazov", author: "Fyodor Dostoevsky", rating: 4.5, genre: "fiction", link: "https://www.goodreads.com/book/show/4934.The_Brothers_Karamazov" },
+            { title: "Wuthering Heights", author: "Emily Brontë", rating: 4.1, genre: "fiction", link: "https://www.goodreads.com/book/show/6185.Wuthering_Heights" },
+            {title:"ದಾಟು",author:"S.L. Bhyrappa",rating:4.29,genre:"fiction",link:"https://www.goodreads.com/book/show/13706919-daatu?ref=rae_4"},
+            { title: "The Picture of Dorian Gray", author: "Oscar Wilde", rating: 4.1, genre: "fiction", link: "https://www.goodreads.com/book/show/5297.The_Picture_of_Dorian_Gray" },
+            { title: "Heavy and Hoofed (Cow)", author: "Moira Butterfield, Wayne Ford (Illustrator)", rating: 5, genre: "fiction", link: "https://www.goodreads.com/book/show/158234.Ann_Karenina" },
+            {title:"ಬೆಟ್ಟದ ಜೀವ",author:"Kota Shivarama Karanth",rating:4.30,link:"https://www.goodreads.com/book/show/13625014-bettada-jeeva?ref=rae_5"},
+            { title: "Dracula", author: "Bram Stoker", rating: 4.0, genre: "fiction", link: "https://www.goodreads.com/book/show/4725.Dracula" },
+            { title: "The Stranger", author: "Albert Camus", rating: 4.0, genre: "fiction", link: "https://www.goodreads.com/book/show/49552.The_Stranger" },
+            {title:"ಹೇಮಾವತಿ",author:"ಗೊರೂರು ರಾಮಸ್ವಾಮಿ ಅಯ್ಯಂಗಾರ್",rating:4.18,genre:"fiction",link:"https://www.goodreads.com/book/show/53413393?ref=rae_6"},
+            { title: "The Odyssey", author: "Homer", rating: 4.0, genre: "fiction", link: "https://www.goodreads.com/book/show/1381.The_Odyssey" },
+
+
+             // Non-fiction Books
+             {title:"ಮಲೆನಾಡಿನ ಚಿತ್ರಗಳು",author:"Kuvempu",rating:4.30,genre:"non-fiction",link:"https://www.goodreads.com/book/show/18056806-malenadina-chitragalu?ref=rae_16"},
+             { title: "Sapiens: A Brief History of Humankind", author: "Yuval Noah Harari", rating: 4.5, genre: "non-fiction", link: "https://www.goodreads.com/book/show/23692271-sapiens" },
+            { title: "Educated", author: "Tara Westover", rating: 4.4, genre: "non-fiction", link: "https://www.goodreads.com/book/show/11580217-educated" },
+            { title: "Becoming", author: "Michelle Obama", rating: 4.6, genre: "non-fiction", link: "https://www.goodreads.com/book/show/38746485-becoming" },
+            { title: "Quiet: The Power of Introverts in a World That Can't Stop Talking", author: "Susan Cain", rating: 4.1, genre: "non-fiction", link: "https://www.goodreads.com/book/show/8520610-quiet" },
+            { title: "The Body Keeps the Score", author: "Bessel van der Kolk", rating: 4.7, genre: "non-fiction", link: "https://www.goodreads.com/book/show/18693771-the-body-keeps-the-score" },
+            { title: "Outliers", author: "Malcolm Gladwell", rating: 4.1, genre: "non-fiction", link: "https://www.goodreads.com/book/show/3228917-outliers" },
+            { title: "The Power of Habit", author: "Charles Duhigg", rating: 4.1, genre: "non-fiction", link: "https://www.goodreads.com/book/show/12609433-the-power-of-habit" },
+            { title: "The Warmth of Other Suns", author: "Isabel Wilkerson", rating: 4.7, genre: "non-fiction", link: "https://www.goodreads.com/book/show/6712413-the-warmth-of-other-suns" },
+            { title: "When Breath Becomes Air", author: "Paul Kalanithi", rating: 4.5, genre: "non-fiction", link: "https://www.goodreads.com/book/show/25580553-when-breath-becomes-air" },
+            { title: "The Four Agreements", author: "Don Miguel Ruiz", rating: 4.2, genre: "non-fiction", link: "https://www.goodreads.com/book/show/6596.The_Four_Agreements" },
+            { title: "Thinking, Fast and Slow", author: "Daniel Kahneman", rating: 4.2, genre: "non-fiction", link: "https://www.goodreads.com/book/show/1136595.Thinking_Fast_and_Slow" },
+            { title: "Into the Wild", author: "Jon Krakauer", rating: 4.3, genre: "non-fiction", link: "https://www.goodreads.com/book/show/132486.Into_the_Wild" },
+            { title: "Unbroken", author: "Laura Hillenbrand", rating: 4.4, genre: "non-fiction", link: "https://www.goodreads.com/book/show/8664353-unbroken" },
+
+             // Romance Books
+             {title:"ಮಲೆಗಳಲ್ಲಿ ಮದುಮಗಳು",author:"Kuvempu",rating:4.08,genre:"romance",link:"https://www.goodreads.com/book/show/11554723-malegalali-madumagalu?ref=rae_1"},
+             { title: "Pride and Prejudice", author: "Jane Austen", rating: 4.6, genre: "romance", link: "https://www.goodreads.com/book/show/1885.Pride_and_Prejudice" },
+            { title: "The Fault in Our Stars", author: "John Green", rating: 4.2, genre: "romance", link: "https://www.goodreads.com/book/show/11870085-the-fault-in-our-stars" },
+            { title: "Outlander", author: "Diana Gabaldon", rating: 4.4, genre: "romance", link: "https://www.goodreads.com/book/show/10964.Outlander" },
+            { title: "Me Before You", author: "Jojo Moyes", rating: 4.3, genre: "romance", link: "https://www.goodreads.com/book/show/15507958-me-before-you" },
+            { title: "The Hating Game", author: "Sally Thorne", rating: 4.1, genre: "romance", link: "https://www.goodreads.com/book/show/25883848-the-hating-game" },
+            { title: "The Notebook", author: "Nicholas Sparks", rating: 4.2, genre: "romance", link: "https://www.goodreads.com/book/show/15931.The_Notebook" },
+            { title: "It Ends with Us", author: "Colleen Hoover", rating: 4.4, genre: "romance", link: "https://www.goodreads.com/book/show/22726319-it-ends-with-us" },
+            { title: "The Rosie Project", author: "Graeme Simsion", rating: 4.1, genre: "romance", link: "https://www.goodreads.com/book/show/16181775-the-rosie-project" },
+            { title: "The Kiss Quotient", author: "Helen Hoang", rating: 4.0, genre: "romance", link: "https://www.goodreads.com/book/show/34848582-the-kiss-quotient" },
+            { title: "All the Light We Cannot See", author: "Anthony Doerr", rating: 4.3, genre: "romance", link: "https://www.goodreads.com/book/show/18143977-all-the-light-we-cannot-see" },
+            { title: "The Wedding Date", author: "Jasmine Guillory", rating: 3.9, genre: "romance", link: "https://www.goodreads.com/book/show/32365843-the-wedding-date" },
+            { title: "Big Little Lies", author: "Liane Moriarty", rating: 4.3, genre: "romance", link: "https://www.goodreads.com/book/show/19486412-big-little-lies" },
+            { title: "The Proposal", author: "Jasmine Guillory", rating: 4.0, genre: "romance", link: "https://www.goodreads.com/book/show/40233356-the-proposal" },
+            { title: "The Sun Is Also a Star", author: "Nicola Yoon", rating: 4.1, genre: "romance", link: "https://www.goodreads.com/book/show/28763485-the-sun-is-also-a-star" },
+
+              // Thriller Books
+            {title:"ಜುಗಾರಿ ಕ್ರಾಸ್",author:"K.P. Poornachandra Tejaswi",rating:4.31,genre:"thriller",link:"https://www.goodreads.com/book/show/5299627-jugaari-cross?ref=rae_10"}, 
+            { title: "Gone Girl", author: "Gillian Flynn", rating: 4.1, genre: "thriller", link: "https://www.goodreads.com/book/show/19288043-gone-girl" },
+            { title: "The Girl with the Dragon Tattoo", author: "Stieg Larsson", rating: 4.2, genre: "thriller", link: "https://www.goodreads.com/book/show/2429135.The_Girl_with_the_Dragon_Tattoo" },
+
+            { title: "The Silent Patient", author: "Alex Michaelides", rating: 4.1, genre: "thriller", link: "https://www.goodreads.com/book/show/40097951-the-silent-patient" },
+            { title: "Before I Go to Sleep", author: "S.J. Watson", rating: 3.9, genre: "thriller", link: "https://www.goodreads.com/book/show/9357.Before_I_Go_to_Sleep" },
+            { title: "The Woman in the Window", author: "A.J. Finn", rating: 3.8, genre: "thriller", link: "https://www.goodreads.com/book/show/40245215-the-woman-in-the-window" },
+            { title: "Sharp Objects", author: "Gillian Flynn", rating: 4.0, genre: "thriller", link: "https://www.goodreads.com/book/show/18045891-sharp-objects" },
+            { title: "Big Little Lies", author: "Liane Moriarty", rating: 4.3, genre: "thriller", link: "https://www.goodreads.com/book/show/19486412-big-little-lies" },
+            { title: "I Am Watching You", author: "Terra Laurence", rating: 4.0, genre: "thriller", link: "https://www.goodreads.com/book/show/39160722-i-am-watching-you" },
+            { title: "The Couple Next Door", author: "Shari Lapena", rating: 3.9, genre: "thriller", link: "https://www.goodreads.com/book/show/28220898-the-couple-next-door" },
+            { title: "The Girl on the Train", author: "Paula Hawkins", rating: 4.0, genre: "thriller", link: "https://www.goodreads.com/book/show/22557272-the-girl-on-the-train" },
+            { title: "The Last Time I Lied", author: "Riley Sager", rating: 4.0, genre: "thriller", link: "https://www.goodreads.com/book/show/36517214-the-last-time-i-lied" },
+            { title: "In the Woods", author: "Tana French", rating: 4.1, genre: "thriller", link: "https://www.goodreads.com/book/show/7172.In_the_Woods" },
+            { title: "The No. 1 Ladies' Detective Agency", author: "Alexander McCall Smith", rating: 4.0, genre: "thriller", link: "https://www.goodreads.com/book/show/12039.The_No_1_Ladies_Detective_Agency" },
+
+
+             // Science Fiction Books
+             {title:"ಕರ್ವಾಲೊ",author:"K.P. Poornachandra Tejaswi",rating:4.40,genre:"science-fiction",link:"https://www.goodreads.com/book/show/5298977-karvalo?ref=rae_8"},
+            { title: "Dune", author: "Frank Herbert", rating: 4.3, genre: "science-fiction", link: "https://www.goodreads.com/book/show/234225" },
+            { title: "The Martian", author: "Andy Weir", rating: 4.5, genre: "science-fiction", link: "https://www.goodreads.com/book/show/18007564-the-martian" },
+            { title: "Ender's Game", author: "Orson Scott Card", rating: 4.3, genre: "science-fiction", link: "https://www.goodreads.com/book/show/375802.Ender_s_Game" },
+            { title: "Neuromancer", author: "William Gibson", rating: 4.0, genre: "science-fiction", link: "https://www.goodreads.com/book/show/22328.Neuromancer" },
+            { title: "Snow Crash", author: "Neal Stephenson", rating: 4.1, genre: "science-fiction", link: "https://www.goodreads.com/book/show/830.Snow_Crash" },
+            { title: "The Left Hand of Darkness", author: "Ursula K. Le Guin", rating: 4.2, genre: "science-fiction", link: "https://www.goodreads.com/book/show/18455.The_Left_Hand_of_Darkness" },
+            { title: "The Time Machine", author: "H.G. Wells", rating: 4.0, genre: "science-fiction", link: "https://www.goodreads.com/book/show/2493.The_Time_Machine" },
+            { title: "Hyperion", author: "Dan Simmons", rating: 4.3, genre: "science-fiction", link: "https://www.goodreads.com/book/show/13896.Hyperion" },
+            { title: "Brave New World", author: "Aldous Huxley", rating: 4.2, genre: "science-fiction", link: "https://www.goodreads.com/book/show/5479.Brave_New_World" },
+            { title: "The Forever War", author: "Joe Haldeman", rating: 4.2, genre: "science-fiction", link: "https://www.goodreads.com/book/show/124161.The_Forever_War" },
+
+             // Historical Books
+             {title:"ಆವರಣ",author:"S.L. Bhyrappa, Jaya Venkatraman(Translator), Dr. Vishwasa (Translator)",rating:4.45,genre:"historical",link:"https://www.goodreads.com/book/show/12327052-aavarana?ref=rae_5"},
+             { title: "All the Light We Cannot See", author: "Anthony Doerr", rating: 4.3, genre: "historical", link: "https://www.goodreads.com/book/show/18143977-all-the-light-we-cannot-see" },
+            { title: "The Book Thief", author: "Markus Zusak", rating: 4.3, genre: "historical", link: "https://www.goodreads.com/book/show/19063.The_Book_Thief" },
+            { title: "The Nightingale", author: "Kristin Hannah", rating: 4.5, genre: "historical", link: "https://www.goodreads.com/book/show/21853621-the-nightingale" },
+            { title: "The Pillars of the Earth", author: "Ken Follett", rating: 4.3, genre: "historical", link: "https://www.goodreads.com/book/show/5043.The_Pillars_of_the_Earth" },
+            { title: "The Help", author: "Kathryn Stockett", rating: 4.4, genre: "historical", link: "https://www.goodreads.com/book/show/4667024-the-help" },
+            { title: "The Tattooist of Auschwitz", author: "Heather Morris", rating: 4.3, genre: "historical", link: "https://www.goodreads.com/book/show/35638276-the-tattooist-of-auschwitz" },
+            { title: "Atonement", author: "Ian McEwan", rating: 4.2, genre: "historical", link: "https://www.goodreads.com/book/show/200405.Atonement" },
+            { title: "The Paris Architect", author: "Charles Belfoure", rating: 4.2, genre: "historical", link: "https://www.goodreads.com/book/show/17779235-the-paris-architect" },
+            { title: "The Orphan's Tale", author: "Pam Jenoff", rating: 4.1, genre: "historical", link: "https://www.goodreads.com/book/show/29496797-the-orphans-tale" },
+            { title: "The Shadow of the Wind", author: "Carlos Ruiz Zafón", rating: 4.3, genre: "historical", link: "https://www.goodreads.com/book/show/1232.The_Shadow_of_the_Wind" },
+
+            // Biography Books
+            { title: "Steve Jobs", author: "Walter Isaacson", rating: 4.2, genre: "biography", link: "https://www.goodreads.com/book/show/11084145-steve-jobs" },
+            { title: "The Diary of a Young Girl", author: "Anne Frank", rating: 4.3, genre: "biography", link: "https://www.goodreads.com/book/show/48855.The_Diary_of_a_Young_Girl" },
+            { title: "Becoming", author: "Michelle Obama", rating: 4.6, genre: "biography", link: "https://www.goodreads.com/book/show/38746485-becoming" },
+            { title: "Long Walk to Freedom", author: "Nelson Mandela", rating: 4.5, genre: "biography", link: "https://www.goodreads.com/book/show/10884.Long_Walk_to_Freedom" },
+            { title: "The Glass Castle", author: "Jeannette Walls", rating: 4.1, genre: "biography", link: "https://www.goodreads.com/book/show/7445.The_Glass_Castle" },
+            { title: "Educated", author: "Tara Westover", rating: 4.4, genre: "biography", link: "https://www.goodreads.com/book/show/11580217-educated" },
+            { title: "Into the Wild", author: "Jon Krakauer", rating: 4.3, genre: "biography", link: "https://www.goodreads.com/book/show/132486.Into_the_Wild" },
+            { title: "The Immortal Life of Henrietta Lacks", author: "Rebecca Skloot", rating: 4.4, genre: "biography", link: "https://www.goodreads.com/book/show/6493208-the-immortal-life-of-henrietta-lacks" },
+            { title: "When Breath Becomes Air", author: "Paul Kalanithi", rating: 4.5, genre: "biography", link: "https://www.goodreads.com/book/show/25580553-when-breath-becomes-air" },
+            { title: "Alexander Hamilton", author: "Ron Chernow", rating: 4.4, genre: "biography", link: "https://www.goodreads.com/book/show/16126778-alexander-hamilton" },
+
+
+                        // Self-Help Books
+                        {title:"ಮ೦ಕುತಿಮ್ಮನ ಕಗ್ಗ",author:"D.V.G.",rating: 4.5, genre: "self-help", link:"https://www.goodreads.com/book/show/17936113-mankutimmana-kagga?ref=rae_17#CommunityReviews"},
+            { title: "Atomic Habits", author: "James Clear", rating: 4.5, genre: "self-help", link: "https://www.goodreads.com/book/show/40121378-atomic-habits" },
+            { title: "The Power of Now", author: "Eckhart Tolle", rating: 4.2, genre: "self-help", link: "https://www.goodreads.com/book/show/6708.The_Power_of_Now" },
+            { title: "The 7 Habits of Highly Effective People", author: "Stephen R. Covey", rating: 4.2, genre: "self-help", link: "https://www.goodreads.com/book/show/359189.The_7_Habits_of_Highly_Effective_People" },
+            { title: "Think and Grow Rich", author: "Napoleon Hill", rating: 4.3, genre: "self-help", link: "https://www.goodreads.com/book/show/30186904-think-and-grow-rich" },
+            { title: "The Subtle Art of Not Giving a F*ck", author: "Mark Manson", rating: 4.2, genre: "self-help", link: "https://www.goodreads.com/book/show/28257707-the-subtle-art-of-not-giving-a-fck" },
+            { title: "The Four Agreements", author: "Don Miguel Ruiz", rating: 4.2, genre: "self-help", link: "https://www.goodreads.com/book/show/6596.The_Four_Agreements" },
+            { title: "You Are a Badass", author: "Jen Sincero", rating: 4.1, genre: "self-help", link: "https://www.goodreads.com/book/show/15843138-you-are-a-badass" },
+            { title: "The Miracle Morning", author: "Hal Elrod", rating: 4.2, genre: "self-help", link: "https://www.goodreads.com/book/show/13636334-the-miracle-morning" },
+            { title: "Grit", author: "Angela Duckworth", rating: 4.2, genre: "self-help", link: "https://www.goodreads.com/book/show/27213329-grit" },
+            { title: "The Power of Habit", author: "Charles Duhigg", rating: 4.1, genre: "self-help", link: "https://www.goodreads.com/book/show/12609433-the-power-of-habit" },
+
+             
+
+            // Comics
+            { title: "Watchmen", author: "Alan Moore", rating: 4.4, genre: "comics", link: "https://www.goodreads.com/book/show/472331.Watchmen" },
+            { title: "Maus", author: "Art Spiegelman", rating: 4.5, genre: "comics", link: "https://www.goodreads.com/book/show/15131.Maus" },
+            { title: "The Sandman", author: "Neil Gaiman", rating: 4.4, genre: "comics", link: "https://www.goodreads.com/book/show/79898.The_Sandman_Vol_1_Preludes_Nocturnes" },
+            { title: "Batman: The Killing Joke", author: "Alan Moore", rating: 4.3, genre: "comics", link: "https://www.goodreads.com/book/show/410579.Batman" },
+            { title: "Spider-Man: Blue", author: "Jeph Loeb", rating: 4.2, genre: "comics", link: "https://www.goodreads.com/book/show/279929.Spider_Man" },
+            { title: "V for Vendetta", author: "Alan Moore", rating: 4.4, genre: "comics", link: "https://www.goodreads.com/book/show/4181.V_for_Vendetta" },
+            { title: "Saga", author: "Brian K. Vaughan", rating: 4.4, genre: "comics", link: "https://www.goodreads.com/book/show/15794715-saga" },
+            { title: "Y: The Last Man", author: "Brian K. Vaughan", rating: 4.4, genre: "comics", link: "https://www.goodreads.com/book/show/7651.Y_the_Last_Man" },
+            { title: "Bone", author: "Jeff Smith", rating: 4.3, genre: "comics", link: "https://www.goodreads.com/book/show/13130.Bone_Vol_1_Friends_Forever" },
+            { title: "The Walking Dead", author: "Robert Kirkman", rating: 4.3, genre: "comics", link: "https://www.goodreads.com/book/show/77.The_Walking_Dead_Vol_1" },
+            { title: "The Dark Knight Returns", author: "Frank Miller", rating: 4.4, genre: "comics", link: "https://www.goodreads.com/book/show/20742.The_Dark_Knight_Returns" },
+            { title: "Fables", author: "Bill Willingham", rating: 4.2, genre: "comics", link: "https://www.goodreads.com/book/show/15751.Fables_Vol_1_Fairest_of_All" },
+            { title: "Persepolis", author: "Marjane Satrapi", rating: 4.2, genre: "comics", link: "https://www.goodreads.com/book/show/15108.Persepolis" },
+            { title: "Locke & Key", author: "Joe Hill", rating: 4.3, genre: "comics", link: "https://www.goodreads.com/book/show/450799.Locke_Key_Vol_1" },
+
+             // Horror
+             { title: "The Shining", author: "Stephen King", rating: 4.4, genre: "horror", link: "https://www.goodreads.com/book/show/11588.The_Shining" },
+            { title: "Dracula", author: "Bram Stoker", rating: 4.2, genre: "horror", link: "https://www.goodreads.com/book/show/17245.Dracula" },
+            { title: "Frankenstein", author: "Mary Shelley", rating: 4.2, genre: "horror", link: "https://www.goodreads.com/book/show/18490.Frankenstein" },
+            { title: "Mexican Gothic", author: "Silvia Moreno-Garcia", rating: 4.0, genre: "horror", link: "https://www.goodreads.com/book/show/53152624-mexican-gothic" },
+            { title: "World War Z", author: "Max Brooks", rating: 4.0, genre: "horror", link: "https://www.goodreads.com/book/show/8908.World_War_Z" },
+            { title: "House of Leaves", author: "Mark Z. Danielewski", rating: 4.2, genre: "horror", link: "https://www.goodreads.com/book/show/24806.House_of_Leaves" },
+
+             // Story Books
+             {title:"ಪರಿಸರದ ಕತೆ",author:"K.P. Poornachandra Tejaswi",rating:4.47,genre:"story-books",link:"https://www.goodreads.com/book/show/17558106-parisarada-kathe?ref=rae_15"},
+             { title: "The Alchemist", author: "Paulo Coelho", rating: 4.3, genre: "story-books", link: "https://www.goodreads.com/book/show/865.The_Alchemist" },
+            { title: "The Little Prince", author: "Antoine de Saint-Exupéry", rating: 4.3, genre: "story-books", link: "https://www.goodreads.com/book/show/157993" },
+            { title: "The Hobbit", author: "J.R.R. Tolkien", rating: 4.3, genre: "story-books", link: "https://www.goodreads.com/book/show/5907.The_Hobbit" },
+            { title: "Alice's Adventures in Wonderland", author: "Lewis Carroll", rating: 4.2, genre: "story-books", link: "https://www.goodreads.com/book/show/24213.Alice_s_Adventures_in_Wonderland" },
+            { title: "Charlotte's Web", author: "E.B. White", rating: 4.3, genre: "story-books", link: "https://www.goodreads.com/book/show/24178.Charlotte_s_Web" },
+            { title: "Peter Pan", author: "J.M. Barrie", rating: 4.2, genre: "story-books", link: "https://www.goodreads.com/book/show/51491.Peter_Pan" },
+            { title: "Matilda", author: "Roald Dahl", rating: 4.3, genre: "story-books", link: "https://www.goodreads.com/book/show/39988.Matilda" },
+            { title: "The Lion, the Witch and the Wardrobe", author: "C.S. Lewis", rating: 4.2, genre: "story-books", link: "https://www.goodreads.com/book/show/1009157.The_Lion_the_Witch_and_the_Wardrobe" },
+            { title: "Winnie-the-Pooh", author: "A.A. Milne", rating: 4.3, genre: "story-books", link: "https://www.goodreads.com/book/show/4913.Winnie_the_Pooh" },
+            { title: "The Wind in the Willows", author: "Kenneth Grahame", rating: 4.1, genre: "story-books", link: "https://www.goodreads.com/book/show/78986.The_Wind_in_the_Willows" },
+            { title: "Anne of Green Gables", author: "L.M. Montgomery", rating: 4.2, genre: "story-books", link: "https://www.goodreads.com/book/show/8127.Anne_of_Green_Gables" },
+            { title: "The Tale of Peter Rabbit", author: "Beatrix Potter", rating: 4.2, genre: "story-books", link: "https://www.goodreads.com/book/show/15915132-the-tale-of-peter-rabbit" },
+            { title: "The Brothers Grimm Fairy Tales", author: "Brothers Grimm", rating: 4.2, genre: "story-books", link: "https://www.goodreads.com/book/show/26773.The_Brothers_Grimm_Fairy_Tales" },
+            { title: "The Adventures of Tom Sawyer", author: "Mark Twain", rating: 4.1, genre: "story-books", link: "https://www.goodreads.com/book/show/7424.The_Adventures_of_Tom_Sawyer" },
+
+
+
+            // Mystery Books
+            {title:"ಚಿದಂಬರ ರಹಸ್ಯ",author:"K.P. Poornachandra Tejaswi",rating:4.18,genre:"mystery",link:"https://www.goodreads.com/book/show/13633552-chidambara-rahasya?ref=rae_0"},
+            { title: "The Girl with the Dragon Tattoo", author: "Stieg Larsson", rating: 4.2, genre: "mystery", link: "https://www.goodreads.com/book/show/2429135.The_Girl_with_the_Dragon_Tattoo" },
+            { title: "Gone Girl", author: "Gillian Flynn", rating: 4.1, genre: "mystery", link: "https://www.goodreads.com/book/show/19288043-gone-girl" },
+            { title: "Big Little Lies", author: "Liane Moriarty", rating: 4.3, genre: "mystery", link: "https://www.goodreads.com/book/show/19486412-big-little-lies" },
+            { title: "The Silent Patient", author: "Alex Michaelides", rating: 4.1, genre: "mystery", link: "https://www.goodreads.com/book/show/40097951-the-silent-patient" },
+            { title: "The Woman in the Window", author: "A.J. Finn", rating: 3.8, genre: "mystery", link: "https://www.goodreads.com/book/show/40245215-the-woman-in-the-window" },
+            { title: "Sharp Objects", author: "Gillian Flynn", rating: 4.0, genre: "mystery", link: "https://www.goodreads.com/book/show/18045891-sharp-objects" },
+            { title: "Before I Go to Sleep", author: "S.J. Watson", rating: 3.9, genre: "mystery", link: "https://www.goodreads.com/book/show/9357.Before_I_Go_to_Sleep" },
+            { title: "The Couple Next Door", author: "Shari Lapena", rating: 3.9, genre: "mystery", link: "https://www.goodreads.com/book/show/28220898-the-couple-next-door" },
+            { title: "In the Woods", author: "Tana French", rating: 4.1, genre: "mystery", link: "https://www.goodreads.com/book/show/7172.In_the_Woods" },
+            { title: "The No. 1 Ladies' Detective Agency", author: "Alexander McCall Smith", rating: 4.0, genre: "mystery", link: "https://www.goodreads.com/book/show/12039.The_No_1_Ladies_Detective_Agency" },
+            { title: "The Secret History", author: "Donna Tartt", rating: 4.0, genre: "mystery", link: "https://www.goodreads.com/book/show/29044.The_Secret_History" },
+            { title: "I Am Watching You", author: "Terra Laurence", rating: 4.0, genre: "mystery", link: "https://www.goodreads.com/book/show/39160722-i-am-watching-you" },
+            { title: "The Girl on the Train", author: "Paula Hawkins", rating: 4.0, genre: "mystery", link: "https://www.goodreads.com/book/show/22557272-the-girl-on-the-train" },
+            { title: "The Last Time I Lied", author: "Riley Sager", rating: 4.0, genre: "mystery", link: "https://www.goodreads.com/book/show/36517214-the-last-time-i-lied" },
+            
+            // Fantasy Books
+            { title: "The Hobbit", author: "J.R.R. Tolkien", rating: 4.6, genre: "fantasy", link: "https://www.goodreads.com/book/show/5907.The_Hobbit" },
+            { title: "Harry Potter and the Sorcerer's Stone", author: "J.K. Rowling", rating: 4.9, genre: "fantasy", link: "https://www.goodreads.com/book/show/3.Harry_Potter_and_the_Sorcerer_s_Stone" },
+            { title: "The Name of the Wind", author: "Patrick Rothfuss", rating: 4.5, genre: "fantasy", link: "https://www.goodreads.com/book/show/186074.The_Name_of_the_Wind" },
+            { title: "Mistborn", author: "Brandon Sanderson", rating: 4.7, genre: "fantasy", link: "https://www.goodreads.com/book/show/68429.Mistborn" },
+            { title: "A Game of Thrones", author: "George R.R. Martin", rating: 4.4, genre: "fantasy", link: "https://www.goodreads.com/book/show/13496.A_Game_of_Thrones" },
+            { title: "The Final Empire", author: "Brandon Sanderson", rating: 4.5, genre: "fantasy", link: "https://www.goodreads.com/book/show/124936.The_Final_Empire" },
+            { title: "The Priory of the Orange Tree", author: "Samantha Shannon", rating: 4.4, genre: "fantasy", link: "https://www.goodreads.com/book/show/36664833-the-priory-of-the-orange-tree" },
+            { title: "The Blade Itself", author: "Joe Abercrombie", rating: 4.2, genre: "fantasy", link: "https://www.goodreads.com/book/show/2535.The_Blade_Itself" },
+            { title: "The Black Prism", author: "Brent Weeks", rating: 4.2, genre: "fantasy", link: "https://www.goodreads.com/book/show/6642919-the-black-prism" },
+            { title: "The Night Circus", author: "Erin Morgenstern", rating: 4.1, genre: "fantasy", link: "https://www.goodreads.com/book/show/9361589-the-night-circus" },
+            { title: "The Way of Kings", author: "Brandon Sanderson", rating: 4.5, genre: "fantasy", link: "https://www.goodreads.com/book/show/7235533-the-way-of-kings" },
+            { title: "The Lies of Locke Lamora", author: "Scott Lynch", rating: 4.4, genre: "fantasy", link: "https://www.goodreads.com/book/show/136361.The_Lies_of_Locke_Lamora" },
+            { title: "The Song of Achilles", author: "Madeline Miller", rating: 4.5, genre: "fantasy", link: "https://www.goodreads.com/book/show/13625359-the-song-of-achilles" },
+            { title: "Six of Crows", author: "Leigh Bardugo", rating: 4.5, genre: "fantasy", link: "https://www.goodreads.com/book/show/23437156-six-of-crows" }
+        ];
+
+        // Function to display books
+        function displayBooks(filteredBooks) {
+            const bookListElement = document.getElementById('bookList');
+            bookListElement.innerHTML = '';
+
+            filteredBooks.forEach(book => {
+                const bookElement = document.createElement('div');
+                bookElement.classList.add('book-item');
+                bookElement.innerHTML = `
+                    <h3>${book.title}</h3>
+                    <p><strong>Author:</strong> ${book.author}</p>
+                    <p><strong>Rating:</strong> ${book.rating}</p>
+                    <a href="${book.link}" target="_blank">View Book</a>
+                `;
+                bookListElement.appendChild(bookElement);
+            });
+        }
+
+        // Function to filter books by genre
+        function filterBooks() {
+            const selectedGenre = document.getElementById('genre').value;
+            let filteredBooks;
+
+            if (selectedGenre === 'all') {
+                filteredBooks = books;
+            } else {
+                filteredBooks = books.filter(book => book.genre === selectedGenre);
+            }
+
+            displayBooks(filteredBooks);
+        }
+
+        window.onload = function() {
+            filterBooks(); // Display all books by default
+        };
+    </script>
+
+</body>
+</html>
